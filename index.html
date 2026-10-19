@@ -9,68 +9,75 @@
         body {
             font-family: 'Comic Sans MS', 'PingFang SC', sans-serif;
             background: #0f172a; background-image: radial-gradient(circle at center, #1e1b4b 0%, #0f172a 100%);
-            margin: 0; padding: 15px; display: flex; justify-content: center; align-items: center;
-            min-height: 100vh; color: #fff; overflow: hidden;
+            margin: 0; padding: 10px; display: flex; justify-content: center; align-items: center;
+            min-height: 100vh; color: #fff; overflow-x: hidden;
         }
         
         .game-container {
             background: rgba(30, 27, 75, 0.6); border: 2px solid #818cf8;
-            border-radius: 24px; width: 100%; max-width: 420px; padding: 20px;
+            border-radius: 24px; width: 100%; max-width: 400px; padding: 20px 15px;
             box-shadow: 0 0 30px rgba(129, 140, 248, 0.3), inset 0 0 20px rgba(129, 140, 248, 0.1);
             display: flex; flex-direction: column; backdrop-filter: blur(5px);
+            position: relative;
         }
 
-        .top-bar { display: flex; justify-content: space-between; font-size: 16px; color: #c7d2fe; margin-bottom: 20px;}
+        .top-bar { display: flex; justify-content: space-between; font-size: 15px; color: #c7d2fe; margin-bottom: 15px; font-weight: bold;}
         
         .story-box {
-            background: rgba(255,255,255,0.05); border-left: 4px solid #f472b6; border-radius: 10px;
-            padding: 15px; font-size: 15px; color: #fbcfe8; margin-bottom: 20px; line-height: 1.5;
+            background: rgba(255,255,255,0.05); border-left: 4px solid #f472b6; border-radius: 8px;
+            padding: 12px; font-size: 14px; color: #fbcfe8; margin-bottom: 20px; line-height: 1.5;
+            min-height: 80px;
         }
 
-        /* 召唤阵区域 */
+        /* 页面切换控制 */
+        .stage { display: flex; flex-direction: column; align-items: center; width: 100%; }
+        .hidden { display: none !important; }
+
+        /* --- 阶段1：召唤阵 --- */
         .summon-circle {
-            display: flex; justify-content: center; align-items: center; gap: 20px; margin: 30px 0;
-            background: rgba(0,0,0,0.3); padding: 25px; border-radius: 50%; border: 2px dashed #818cf8;
-            box-shadow: 0 0 20px rgba(129, 140, 248, 0.2) inset;
+            display: flex; justify-content: center; align-items: center; gap: 15px; 
+            margin: 20px 0; background: rgba(0,0,0,0.3); padding: 20px; 
+            border-radius: 50%; border: 2px dashed #818cf8; width: 220px; height: 120px;
         }
         .slot {
-            width: 60px; height: 70px; border: 2px solid #6366f1; border-radius: 12px;
-            display: flex; justify-content: center; align-items: center; font-size: 32px; color: #fff;
+            width: 50px; height: 60px; border: 2px solid #6366f1; border-radius: 10px;
+            display: flex; justify-content: center; align-items: center; font-size: 28px; color: #fff;
             background: rgba(99, 102, 241, 0.2);
         }
-        .plus { font-size: 24px; color: #a5b4fc; }
+        .plus { font-size: 20px; color: #a5b4fc; }
         
-        /* 字母点击池 */
+        /* 字母按钮池 */
         .letter-pool {
-            display: flex; justify-content: center; gap: 15px; margin-top: 20px;
+            display: flex; justify-content: center; gap: 10px; margin-top: 10px; flex-wrap: wrap;
         }
         .letter-btn {
-            width: 60px; height: 70px; background: linear-gradient(135deg, #f472b6, #db2777);
-            border-radius: 12px; display: flex; justify-content: center; align-items: center;
-            font-size: 32px; font-weight: bold; cursor: pointer; box-shadow: 0 6px 0 #9d174d;
+            width: 50px; height: 60px; background: linear-gradient(135deg, #f472b6, #db2777);
+            border-radius: 10px; display: flex; justify-content: center; align-items: center;
+            font-size: 24px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 0 #9d174d;
             transition: all 0.1s; color: white;
         }
-        .letter-btn:active { transform: translateY(6px); box-shadow: none; }
-        .letter-btn.used { opacity: 0; pointer-events: none; }
+        .letter-btn:active { transform: translateY(4px); box-shadow: none; }
+        .letter-btn.used { opacity: 0.3; pointer-events: none; }
 
-        /* 拼写区域 (合成后出现) */
-        .spell-area { display: flex; justify-content: center; gap: 10px; margin-top: 30px; opacity: 0; transition: opacity 0.5s;}
-        .spell-area.show { opacity: 1; }
+        /* --- 阶段2：拼写区 --- */
+        .spell-word-container {
+            display: flex; justify-content: center; gap: 8px; margin: 20px 0;
+        }
         .spell-slot {
-            width: 50px; height: 60px; background: rgba(255,255,255,0.1); border-bottom: 3px solid #a5b4fc;
-            display: flex; justify-content: center; align-items: center; font-size: 28px; color: #fff;
+            width: 45px; height: 55px; background: rgba(255,255,255,0.1); border-bottom: 3px solid #a5b4fc;
+            display: flex; justify-content: center; align-items: center; font-size: 24px; color: #fff;
+            border-radius: 8px 8px 0 0;
         }
-        .spell-slot.filled { border-bottom-color: #4ade80; text-shadow: 0 0 10px #4ade80; }
+        .spell-slot.filled { border-bottom-color: #4ade80; text-shadow: 0 0 10px #4ade80; background: rgba(74, 222, 128, 0.1);}
 
+        /* 提示弹窗 */
         .toast {
-            position: fixed; top: 15%; left: 50%; transform: translateX(-50%);
-            background: rgba(244, 114, 182, 0.9); color: white; padding: 12px 24px; border-radius: 20px;
+            position: absolute; top: 30%; left: 50%; transform: translate(-50%, -50%);
+            background: rgba(244, 114, 182, 0.95); color: white; padding: 12px 20px; border-radius: 20px;
             font-weight: bold; opacity: 0; transition: all 0.3s; pointer-events: none; z-index: 100;
-            font-size: 18px; box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            font-size: 16px; box-shadow: 0 10px 20px rgba(0,0,0,0.3); text-align: center; width: 80%;
         }
-        .toast.show { opacity: 1; top: 20%; }
-
-        .hidden { display: none !important; }
+        .toast.show { opacity: 1; top: 40%; }
     </style>
 </head>
 <body>
@@ -83,38 +90,37 @@
     </div>
 
     <div class="story-box" id="story">
-        前方遇到了野怪！公主，快把平民字母 <b>c</b> 和 <b>h</b> 送入召唤阵，合成“H骑士团 (ch)”，释放魔法！
+        野怪出现了！公主，快把平民字母 <b>c</b> 和 <b>h</b> 送入召唤阵，合成“H骑士团 (ch)”！
     </div>
 
-    <!-- 召唤阵 -->
-    <div class="summon-circle">
-        <div class="slot" id="slot-c"></div>
-        <div class="plus">+</div>
-        <div class="slot" id="slot-h"></div>
-    </div>
-
-    <!-- 字母池 -->
-    <div class="letter-pool" id="pool">
-        <div class="letter-btn" onclick="summonLetter('h', this)">h</div>
-        <div class="letter-btn" onclick="summonLetter('c', this)">c</div>
-    </div>
-
-    <!-- 拼读区域 -->
-    <div class="spell-area" id="spell-area">
-        <div class="story-box" style="text-align:center; border:none; color:#f472b6; font-weight:bold; padding-bottom:0;">
-            骑士团出击！拼出单词：<b>chair</b> (椅子)
+    <!-- 阶段1：合成 ch -->
+    <div id="stage1" class="stage">
+        <div class="summon-circle">
+            <div class="slot" id="slot-c"></div>
+            <div class="plus">+</div>
+            <div class="slot" id="slot-h"></div>
         </div>
-        <div style="display:flex; justify-content:center; gap:10px; margin-top:10px;">
+
+        <div class="letter-pool" id="pool1">
+            <div class="letter-btn" onclick="summonLetter('h', this)">h</div>
+            <div class="letter-btn" onclick="summonLetter('c', this)">c</div>
+        </div>
+    </div>
+
+    <!-- 阶段2：拼读 chair -->
+    <div id="stage2" class="stage hidden">
+        <div class="spell-word-container">
             <div class="spell-slot filled">c</div>
             <div class="spell-slot filled">h</div>
-            <div class="spell-slot" id="s1"></div>
             <div class="spell-slot" id="s2"></div>
             <div class="spell-slot" id="s3"></div>
+            <div class="spell-slot" id="s4"></div>
         </div>
+
         <div class="letter-pool" id="pool2">
-            <div class="letter-btn" onclick="spellWord('a', this)">a</div>
-            <div class="letter-btn" onclick="spellWord('r', this)">r</div>
             <div class="letter-btn" onclick="spellWord('i', this)">i</div>
+            <div class="letter-btn" onclick="spellWord('r', this)">r</div>
+            <div class="letter-btn" onclick="spellWord('a', this)">a</div>
         </div>
     </div>
 </div>
@@ -134,10 +140,10 @@
         const t = document.getElementById('toast');
         t.innerText = msg;
         t.classList.add('show');
-        setTimeout(() => t.classList.remove('show'), 2000);
+        setTimeout(() => t.classList.remove('show'), 1500);
     }
 
-    // --- 第一阶段：合成 ch ---
+    // --- 阶段1：合成 ch ---
     let hasC = false;
     let hasH = false;
 
@@ -154,6 +160,7 @@
             playSound('h');
         }
 
+        // 两个都齐了，触发合成
         if (hasC && hasH) {
             setTimeout(() => {
                 document.getElementById('slot-c').style.borderColor = '#4ade80';
@@ -161,37 +168,45 @@
                 showToast("✨ 召唤成功！H骑士团 (ch) 诞生！");
                 playSound('ch');
                 
+                // 延迟进入第二阶段
                 setTimeout(() => {
-                    document.getElementById('story').innerHTML = "太棒了！<b>ch</b> 骑士发出 [tʃ] 的声音。现在，用骑士团的魔法拼出 <b>chair</b>！";
-                    document.getElementById('spell-area').classList.add('show');
+                    document.getElementById('stage1').classList.add('hidden');
+                    document.getElementById('stage2').classList.remove('hidden');
+                    document.getElementById('story').innerHTML = "太棒了！<b>ch</b> 骑士发出 [tʃ] 的声音。<br>现在，拼出完整的单词 <b>chair</b> (椅子)！";
                 }, 1500);
-            }, 500);
+            }, 400);
         }
     }
 
-    // --- 第二阶段：拼写 chair ---
-    const targetWord = ['a', 'i', 'r']; // c 和 h 已经在前面了
+    // --- 阶段2：拼写 chair ---
+    const targetWord = ['a', 'i', 'r']; // c 和 h 已经在前面了，这里从第三个格子开始填
     let currentIndex = 0;
 
     function spellWord(letter, btn) {
         if (letter === targetWord[currentIndex]) {
-            let slot = document.getElementById('s' + (currentIndex + 1));
+            // 成功点亮下一个格子
+            let slot = document.getElementById('s' + (currentIndex + 2)); 
             slot.innerText = letter;
+            slot.classList.add('filled');
             btn.classList.add('used');
             playSound(letter);
             
             currentIndex++;
             
+            // 拼写完成
             if (currentIndex === 3) {
                 setTimeout(() => {
                     playSound('chair');
-                    showToast("🎉 完美！你打败了野怪，获得了 H军团碎片！");
+                    showToast("🎉 完美！打败了野怪！");
                     document.getElementById('story').innerHTML = "🎉 <b>chair</b> 拼读成功！魔法门又多了一块碎片。";
                     document.getElementById('story').style.color = "#4ade80";
                     document.getElementById('story').style.borderLeftColor = "#4ade80";
-                }, 500);
+                    // 禁用所有按钮
+                    document.querySelectorAll('#pool2 .letter-btn').forEach(b => b.style.pointerEvents = 'none');
+                }, 400);
             }
         } else {
+            // 选错了抖动
             btn.style.transform = "translateX(5px)";
             setTimeout(() => btn.style.transform = "translateX(-5px)", 100);
             setTimeout(() => btn.style.transform = "translateX(0)", 200);
