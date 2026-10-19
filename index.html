@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>超级拼读：辅音英雄R的崛起</title>
+    <style>
+        body {
+            font-family: 'Comic Sans MS', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #74ebd5 0%, #9face6 100%);
+            margin: 0; padding: 20px;
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh;
+        }
+        .game-container {
+            background: white; border-radius: 20px; padding: 20px;
+            width: 100%; max-width: 400px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+        .header {
+            font-size: 20px; font-weight: bold; color: #333;
+            margin-bottom: 10px; padding-bottom: 10px;
+            border-bottom: 2px dashed #ccc;
+        }
+        .story-box {
+            background: #fff3cd; border-radius: 10px; padding: 15px;
+            font-size: 14px; color: #856404; margin-bottom: 20px;
+            text-align: left; line-height: 1.5;
+        }
+        .btn {
+            background: #4CAF50; color: white; border: none;
+            padding: 12px 24px; font-size: 16px; border-radius: 30px;
+            cursor: pointer; margin: 10px 0; width: 100%;
+            transition: transform 0.1s; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .btn:active { transform: scale(0.95); }
+        .btn-blue { background: #2196F3; }
+        .btn-orange { background: #FF9800; }
+        .hidden { display: none; }
+        
+        /* 字母卡片样式 */
+        .letters-container { display: flex; justify-content: center; gap: 10px; margin: 20px 0; }
+        .letter-card {
+            width: 50px; height: 60px; background: #e0e0e0;
+            border-radius: 10px; display: flex; justify-content: center; align-items: center;
+            font-size: 30px; font-weight: bold; color: #555; cursor: pointer;
+            box-shadow: 0 4px 0 #bbb; transition: all 0.2s;
+        }
+        .letter-card:active { transform: translateY(4px); box-shadow: none; }
+        .letter-card.selected { background: #ffecb3; color: #ff9800; }
+        
+        /* 单词展示 */
+        .word-display {
+            font-size: 48px; font-weight: bold; color: #333; margin: 10px 0;
+            letter-spacing: 5px; display: flex; justify-content: center; align-items: center;
+        }
+        .phonetic { font-size: 18px; color: #666; font-family: Arial; }
+        .highlight-r { color: #e91e63; }
+        
+        .feedback { font-size: 16px; font-weight: bold; height: 24px; margin-top: 10px; color: #4CAF50; }
+        .error { color: #f44336; }
+    </style>
+</head>
+<body>
+
+<div class="game-container">
+    <div class="header">🚀 第36关：辅音英雄R的觉醒</div>
+    
+    <!-- 阶段1：故事引入 -->
+    <div id="stage1">
+        <div class="story-box">
+            <b>剧情：</b>拳击手 Rick 曾经像小树苗一样弱（词首弱音 /r/），总被元音国王欺负。但他苦练拳法，变身后带上了火焰（词尾强音 /r/）！<br><br>
+            我们先来听一听，<b>red</b> 和 <b>fire</b>，哪个 Rick 是带火焰的？
+        </div>
+        <button class="btn btn-blue" onclick="playSound('red')">🔊 听 red 的发音</button>
+        <button class="btn btn-blue" onclick="playSound('fire')">🔊 听 fire 的发音</button>
+        <button class="btn" onclick="nextStage(2)">进入拼读工坊</button>
+    </div>
+
+    <!-- 阶段2：拼读 FIRE -->
+    <div id="stage2" class="hidden">
+        <div class="story-box">
+            <b>拼读工坊：</b>请把打乱的字母拼成单词 <b>fire</b>（火）。<br>
+            <i>提示：i 和 e 是一对好朋友，它们发出长音 /aɪ/。</i>
+        </div>
+        
+        <div class="word-display" id="target-word">
+            <span id="slot0" class="letter-card">_</span>
+            <span id="slot1" class="letter-card">_</span>
+            <span id="slot2" class="letter-card">_</span>
+            <span id="slot3" class="letter-card">_</span>
+        </div>
+        
+        <div class="letters-container" id="letter-pool">
+            <!-- 字母块由 JS 动态生成 -->
+        </div>
+        <div class="feedback" id="msg2"></div>
+        <button class="btn hidden" id="btn-next2" onclick="nextStage(3)">去练发音</button>
+    </div>
+
+    <!-- 阶段3：跟读 -->
+    <div id="stage3" class="hidden">
+        <div class="story-box">
+            <b>发音特训：</b>对着屏幕，大声读出 <b>fire</b>！<br>
+            注意词尾的 Rick 要变身，发出卷舌的强音 /r/！
+        </div>
+        <div class="word-display">
+            <span>fire</span>
+        </div>
+        <div class="phonetic">[ 'faɪə(r) ]</div>
+        
+        <button class="btn btn-orange" onclick="startRecord()">🎤 点击录音跟读</button>
+        <div class="feedback" id="msg3"></div>
+    </div>
+</div>
+
+<script>
+    // --- 发音功能（使用浏览器自带TTS） ---
+    function playSound(word) {
+        if ('speechSynthesis' in window) {
+            let utterance = new SpeechSynthesisUtterance(word);
+            utterance.lang = 'en-US';
+            utterance.rate = 0.8; // 语速稍微慢一点
+            speechSynthesis.speak(utterance);
+        } else {
+            alert("您的浏览器不支持语音播放");
+        }
+    }
+
+    // --- 游戏流程控制 ---
+    function nextStage(stage) {
+        document.getElementById('stage1').classList.add('hidden');
+        document.getElementById('stage2').classList.add('hidden');
+        document.getElementById('stage3').classList.add('hidden');
+        document.getElementById('stage' + stage).classList.remove('hidden');
+        
+        if (stage === 2) initSpellingGame();
+    }
+
+    // --- 阶段2：拼写逻辑 ---
+    let targetWord = ['f', 'i', 'r', 'e'];
+    let currentIndex = 0;
+    let availableLetters = ['r', 'f', 'e', 'i']; // 打乱的字母
+
+    function initSpellingGame() {
+        const pool = document.getElementById('letter-pool');
+        pool.innerHTML = '';
+        availableLetters.forEach(letter => {
+            let btn = document.createElement('div');
+            btn.className = 'letter-card';
+            btn.innerText = letter;
+            btn.onclick = () => selectLetter(letter, btn);
+            pool.appendChild(btn);
+        });
+    }
+
+    function selectLetter(letter, element) {
+        if (currentIndex >= 4) return;
+
+        // 自动填入对应的格子
+        let slot = document.getElementById('slot' + currentIndex);
+        slot.innerText = letter;
+        slot.style.background = '#fff';
+        slot.style.boxShadow = 'none';
+        slot.style.cursor = 'default';
+        
+        // 隐藏被选中的字母
+        element.style.visibility = 'hidden';
+        
+        // 播放单字母发音
+        playSound(letter === 'i' ? 'ee' : letter); 
+
+        currentIndex++;
+
+        // 判断是否拼完
+        if (currentIndex === 4) {
+            checkSpelling();
+        }
+    }
+
+    function checkSpelling() {
+        let word = '';
+        for (let i = 0; i < 4; i++) {
+            word += document.getElementById('slot' + i).innerText;
+        }
+
+        let msg = document.getElementById('msg2');
+        if (word === 'fire') {
+            msg.innerText = "🎉 太棒了！Rick 变身成功！";
+            msg.style.color = "#4CAF50";
+            // 给词尾的 r 加上红色高亮
+            document.getElementById('slot3').style.color = '#e91e63';
+            document.getElementById('slot3').innerText = 'r';
+            
+            playSound('fire');
+            document.getElementById('btn-next2').classList.remove('hidden');
+        } else {
+            msg.innerText = "❌ 拼错啦，再试一次吧";
+            msg.style.color = "#f44336";
+            // 重置
+            setTimeout(() => {
+                currentIndex = 0;
+                for(let i=0; i<4; i++) {
+                    let slot = document.getElementById('slot'+i);
+                    slot.innerText = '_';
+                    slot.style.background = '#e0e0e0';
+                    slot.style.boxShadow = '0 4px 0 #bbb';
+                    slot.style.color = '#555';
+                }
+                initSpellingGame(); // 重新生成字母池
+                msg.innerText = "";
+            }, 1500);
+        }
+    }
+
+    // --- 阶段3：模拟跟读 ---
+    function startRecord() {
+        let msg = document.getElementById('msg3');
+        msg.innerText = "🎤 录音中... 请大声读 fire";
+        msg.style.color = "#FF9800";
+        
+        // 模拟录音识别过程
+        setTimeout(() => {
+            msg.innerText = "✅ 识别成功！发音非常标准，Rick 打出了火焰拳！";
+            msg.style.color = "#4CAF50";
+            playSound("Perfect! fire");
+        }, 2000);
+    }
+</script>
+</body>
+</html>
