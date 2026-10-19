@@ -3,215 +3,243 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>魔法音律：H军团的召唤</title>
+    <title>魔法音律：公主回家之路</title>
     <style>
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
         body {
-            font-family: 'Comic Sans MS', 'PingFang SC', sans-serif;
-            background: #0f172a; background-image: radial-gradient(circle at center, #1e1b4b 0%, #0f172a 100%);
-            margin: 0; padding: 10px; display: flex; justify-content: center; align-items: center;
-            min-height: 100vh; color: #fff; overflow-x: hidden;
+            font-family: 'Comic Sans MS', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            /* 参考图1的草地背景色 */
+            background: #b5e48c; 
+            background-image: radial-gradient(#d9ed92 10%, transparent 10%);
+            background-size: 40px 40px;
+            width: 100vw; height: 100vh; overflow: hidden; display: flex; justify-content: center; align-items: center;
         }
         
-        .game-container {
-            background: rgba(30, 27, 75, 0.6); border: 2px solid #818cf8;
-            border-radius: 24px; width: 100%; max-width: 400px; padding: 20px 15px;
-            box-shadow: 0 0 30px rgba(129, 140, 248, 0.3), inset 0 0 20px rgba(129, 140, 248, 0.1);
-            display: flex; flex-direction: column; backdrop-filter: blur(5px);
-            position: relative;
+        /* 游戏主容器（平板宽屏适配） */
+        .game-app {
+            width: 100%; height: 100%; max-width: 1200px; position: relative; display: flex; flex-direction: column;
         }
 
-        .top-bar { display: flex; justify-content: space-between; font-size: 15px; color: #c7d2fe; margin-bottom: 15px; font-weight: bold;}
+        /* 顶部状态栏 */
+        .top-bar {
+            position: absolute; top: 20px; left: 20px; right: 20px;
+            display: flex; justify-content: space-between; align-items: center; z-index: 10;
+        }
+        .user-info {
+            display: flex; align-items: center; gap: 10px;
+            background: rgba(255,255,255,0.7); padding: 5px 20px 5px 5:px; border-radius: 30px; box-shadow: 0  center4px 10px rgba;(0 justify-content,0,0:,0.1);
+        }
+ center       ;
+ .avatar { width: 50       px; height: }
+ 50px; background:        
+ #ffd54f; border       -radius: 50%; /* display: flex; justify-content : center; align-items: center; font模拟-size: 28px; border: 3px solid #fff; }
+        .level { font-weight: bold; color: #2d6a4f; font-size: 18px; }
         
-        .story-box {
-            background: rgba(255,255,255,0.05); border-left: 4px solid #f472b6; border-radius: 8px;
-            padding: 12px; font-size: 14px; color: #fbcfe8; margin-bottom: 20px; line-height: 1.5;
-            min-height: 80px;
+        .resources { display: flex; gap: 15px; }
+        .res-item {
+            background: rgba(255,255,255,0.8); padding: 8px 20px; border-radius: 30px;
+            display: flex; align-items: center; gap: 5px; font-weight: bold; color: #d81b60; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
 
-        /* 页面切换控制 */
-        .stage { display: flex; flex-direction: column; align-items: center; width: 100%; }
-        .hidden { display: none !important; }
-
-        /* --- 阶段1：召唤阵 --- */
-        .summon-circle {
-            display: flex; justify-content: center; align-items: center; gap: 15px; 
-            margin: 20px 0; background: rgba(0,0,0,0.3); padding: 20px; 
-            border-radius: 50%; border: 2px dashed #818cf8; width: 220px; height: 120px;
+        /* 中间地图关卡区域 */
+        .map-container {
+            flex: 1; position: relative; width: 100%; display: flex; align-items关卡路径 (用相对定位摆放) */
+        .level-node {
+            position: absolute; display: flex; flex-direction: column; align-items: center;
+            cursor: pointer; transition: transform 0.2s;
         }
-        .slot {
-            width: 50px; height: 60px; border: 2px solid #6366f1; border-radius: 10px;
-            display: flex; justify-content: center; align-items: center; font-size: 28px; color: #fff;
-            background: rgba(99, 102, 241, 0.2);
-        }
-        .plus { font-size: 20px; color: #a5b4fc; }
+        .level-node:active { transform: scale(0.95); }
         
-        /* 字母按钮池 */
-        .letter-pool {
-            display: flex; justify-content: center; gap: 10px; margin-top: 10px; flex-wrap: wrap;
+        .node-circle {
+            width: 120px; height: 120px; border-radius: 50%; background: #fff;
+            border: 6px solid #81c784; display: flex; justify-content: center; align-items: center;
+            font-size: 50px; box-shadow: 0 8px 15px rgba(0,0,0,0.15); position: relative;
         }
-        .letter-btn {
-            width: 50px; height: 60px; background: linear-gradient(135deg, #f472b6, #db2777);
-            border-radius: 10px; display: flex; justify-content: center; align-items: center;
-            font-size: 24px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 0 #9d174d;
-            transition: all 0.1s; color: white;
+        
+        /* 当前可玩节点发光效果 */
+        .node-circle.active {
+            border-color: #ffca28; box-shadow: 0 0 30px #ffca28;
+            animation: pulse 2s infinite;
         }
-        .letter-btn:active { transform: translateY(4px); box-shadow: none; }
-        .letter-btn.used { opacity: 0.3; pointer-events: none; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
 
-        /* --- 阶段2：拼写区 --- */
-        .spell-word-container {
-            display: flex; justify-content: center; gap: 8px; margin: 20px 0;
+        /* 锁定的节点 */
+        .node-circle.locked { background: #e0e0e0; border-color: #bdbdbd; opacity: 0.8; }
+        
+        .node-title {
+            margin-top: 10px; background: #52b788; color: #fff; padding: 5px 15px;
+            border-radius: 15px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 0 #2d6a4f;
         }
-        .spell-slot {
-            width: 45px; height: 55px; background: rgba(255,255,255,0.1); border-bottom: 3px solid #a5b4fc;
-            display: flex; justify-content: center; align-items: center; font-size: 24px; color: #fff;
-            border-radius: 8px 8px 0 0;
-        }
-        .spell-slot.filled { border-bottom-color: #4ade80; text-shadow: 0 0 10px #4ade80; background: rgba(74, 222, 128, 0.1);}
 
-        /* 提示弹窗 */
-        .toast {
-            position: absolute; top: 30%; left: 50%; transform: translate(-50%, -50%);
-            background: rgba(244, 114, 182, 0.95); color: white; padding: 12px 20px; border-radius: 20px;
-            font-weight: bold; opacity: 0; transition: all 0.3s; pointer-events: none; z-index: 100;
-            font-size: 16px; box-shadow: 0 10px 20px rgba(0,0,0,0.3); text-align: center; width: 80%;
+        /* 星星 */
+        .stars { position: absolute; top: -25px; display: flex; gap: 5px; font-size: 24px; text-shadow: 0 2px 4px rgba(0,0,0,0.2);}
+
+        /* 底部进度条 */
+        .bottom-progress {
+            height: 60px; margin: 0 20px 20px 20px; background: rgba(255,255,255,0.6);
+            border-radius: 30px; display: flex; align-items: center; padding: 0 30px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1); position: relative;
         }
-        .toast.show { opacity: 1; top: 40%; }
+        .progress-text { font-weight: bold; color: #2d6a4f; margin-right: 20px; z-index: 2;}
+        .progress-track { flex: 1; height: 15px; background: #d8f3dc; border-radius: 10px; position: relative; }
+        .progress-fill { width: 20%; height: 100%; background: linear-gradient(90deg, #74c69d, #40916c); border-radius: 10px; transition: width 0.5s; }
+        
+        /* --- 弹窗系统 --- */
+        .modal-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 100;
+        }
+        .modal-overlay.show { opacity: 1; pointer-events: auto; }
+
+        .modal-card {
+            background: #fff9e6; width: 600px; border-radius: 30px; padding: 30px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3); position: relative;
+            transform: translateY(20px); transition: transform 0.3s;
+            border: 4px solid #ffca28;
+        }
+        .modal-overlay.show .modal-card { transform: translateY(0); }
+        
+        .close-btn {
+            position: absolute; top: 15px; right: 15px; width: 40px; height: 40px;
+            background: #e0e0e0; border-radius: 50%; display: flex; justify-content: center; align-items: center;
+            font-weight: bold; font-size: 20px; color: #666; cursor: pointer;
+        }
+
+        /* 战报弹窗专属样式 */
+        .report-title { text-align: center; font-size: 28px; color: #d81b60; font-weight: bold; margin-bottom: 20px;}
+        .report-content { display: flex; align-items: center; gap: 20px; }
+        .princess-avatar { font-size: 100px; flex-shrink: 0; background: #e0f7fa; border-radius: 20px; padding: 20px;}
+        .stats-grid { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .stat-box { background: #fff; padding: 15px; border-radius: 15px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05);}
+        .stat-label { font-size: 14px; color: #888; }
+        .stat-value { font-size: 24px; font-weight: bold; color: #333; margin-top: 5px;}
+        .btn-claim {
+            display: block; width: 60%; margin: 20px auto 0; padding: 15px;
+            background: #00e676; color: #fff; font-size: 20px; font-weight: bold;
+            border-radius: 30px; border: none; cursor: pointer; box-shadow: 0 6px 0 #00b248;
+        }
+
+        /* 成就弹窗专属样式 */
+        .achieve-grid { display: flex; justify-content: space-around; margin: 30px 0; }
+        .badge {
+            width: 100px; height: 100px; background: #e0e0e0; border-radius: 50%;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            color: #fff; font-weight: bold; position: relative;
+        }
+        .badge.unlocked { background: #42a5f5; box-shadow: 0 0 15px #90caf9;}
+        .badge.unlocked.bronze { background: #ff9800; box-shadow: 0 0 15px #ffb74d;}
+        .badge span { font-size: 30px; }
+
     </style>
 </head>
 <body>
-<div class="toast" id="toast">提示</div>
 
-<div class="game-container">
+<div class="game-app">
+    <!-- 顶部状态 -->
     <div class="top-bar">
-        <div>👑 人类公主</div>
-        <div>🔮 H军团召唤</div>
-    </div>
-
-    <div class="story-box" id="story">
-        野怪出现了！公主，快把平民字母 <b>c</b> 和 <b>h</b> 送入召唤阵，合成“H骑士团 (ch)”！
-    </div>
-
-    <!-- 阶段1：合成 ch -->
-    <div id="stage1" class="stage">
-        <div class="summon-circle">
-            <div class="slot" id="slot-c"></div>
-            <div class="plus">+</div>
-            <div class="slot" id="slot-h"></div>
+        <div class="user-info" onclick="openModal('modal-report')">
+            <div class="avatar">👸</div>
+            <div class="level">Lv.1 魔法学徒</div>
         </div>
-
-        <div class="letter-pool" id="pool1">
-            <div class="letter-btn" onclick="summonLetter('h', this)">h</div>
-            <div class="letter-btn" onclick="summonLetter('c', this)">c</div>
+        <div class="resources">
+            <div class="res-item">⭐ 星星: 12</div>
+            <div class="res-item">💎 碎片: 3/5</div>
+            <div class="res-item" onclick="openModal('modal-achieve')">🏆 成就</div>
         </div>
     </div>
 
-    <!-- 阶段2：拼读 chair -->
-    <div id="stage2" class="stage hidden">
-        <div class="spell-word-container">
-            <div class="spell-slot filled">c</div>
-            <div class="spell-slot filled">h</div>
-            <div class="spell-slot" id="s2"></div>
-            <div class="spell-slot" id="s3"></div>
-            <div class="spell-slot" id="s4"></div>
+    <!-- 地图区域 -->
+    <div class="map-container">
+        <!-- 节点1：已完成 -->
+        <div class="level-node" style="left: 10%; top: 50%;">
+            <div class="stars">⭐⭐⭐</div>
+            <div class="node-circle">🏰</div>
+            <div class="node-title">起源之石</div>
         </div>
 
-        <div class="letter-pool" id="pool2">
-            <div class="letter-btn" onclick="spellWord('i', this)">i</div>
-            <div class="letter-btn" onclick="spellWord('r', this)">r</div>
-            <div class="letter-btn" onclick="spellWord('a', this)">a</div>
+        <!-- 节点2：当前解锁 -->
+        <div class="level-node" style="left: 35%; top: 30%;" onclick="openModal('modal-report')">
+            <div class="node-circle active">👸</div>
+            <div class="node-title">H军团召唤</div>
+        </div>
+
+        <!-- 节点3：未解锁 -->
+        <div class="level-node" style="left: 60%; top: 60%;">
+            <div class="node-circle locked">🔒</div>
+            <div class="node-title">绵羊之石</div>
+        </div>
+
+        <!-- 节点4：最终目标 -->
+        <div class="level-node" style="left: 85%; top: 40%;">
+            <div class="node-circle locked" style="background:#ffecb3; border-color:#ffca28;">🚪</div>
+            <div class="node-title">魔法门</div>
+        </div>
+    </div>
+
+    <!-- 底部进度条 -->
+    <div class="bottom-progress">
+        <div class="progress-text">回家进度</div>
+        <div class="progress-track">
+            <div class="progress-fill"></div>
         </div>
     </div>
 </div>
 
+<!-- 弹窗：战报结算 -->
+<div class="modal-overlay" id="modal-report">
+    <div class="modal-card">
+        <div class="close-btn" onclick="closeModal('modal-report')">×</div>
+        <div class="report-title">通关战报</div>
+        <div class="report-content">
+            <div class="princess-avatar">👸✨</div>
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="stat-label">拼读正确</div>
+                    <div class="stat-value" style="color:#4caf50;">5 个</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">收集碎片</div>
+                    <div class="stat-value" style="color:#2196f3;">2 枚</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">星级评价</div>
+                    <div class="stat-value" style="color:#ff9800;">⭐⭐⭐</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">奖励星星</div>
+                    <div class="stat-value">+ 50 ⭐</div>
+                </div>
+            </div>
+        </div>
+        <button class="btn-claim" onclick="closeModal('modal-report')">领取奖励</button>
+    </div>
+</div>
+
+<!-- 弹窗：成就与魔法石 -->
+<div class="modal-overlay" id="modal-achieve">
+    <div class="modal-card">
+        <div class="close-btn" onclick="closeModal('modal-achieve')">×</div>
+        <div class="report-title" style="color: #2196f3;">魔法石收集册</div>
+        <div class="achieve-grid">
+            <div class="badge bronze"><span>💎</span><br>起源石</div>
+            <div class="badge"><span>💎</span><br>绵羊石</div>
+            <div class="badge"><span>💎</span><br>救赎石</div>
+            <div class="badge"><span>💎</span><br>友谊石</div>
+        </div>
+        <p style="text-align: center; color: #666;">集齐 11 块魔法石，就能打开时空魔法门回家啦！</p>
+        <button class="btn-claim" onclick="closeModal('modal-achieve')" style="background:#42a5f5; box-shadow: 0 6px 0 #1565c0;">继续收集</button>
+    </div>
+</div>
+
 <script>
-    function playSound(text) {
-        if ('speechSynthesis' in window) {
-            window.speechSynthesis.cancel();
-            let utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = 'en-US';
-            utterance.rate = 0.8;
-            speechSynthesis.speak(utterance);
-        }
+    // 弹窗控制逻辑
+    function openModal(id) {
+        document.getElementById(id).classList.add('show');
     }
 
-    function showToast(msg) {
-        const t = document.getElementById('toast');
-        t.innerText = msg;
-        t.classList.add('show');
-        setTimeout(() => t.classList.remove('show'), 1500);
-    }
-
-    // --- 阶段1：合成 ch ---
-    let hasC = false;
-    let hasH = false;
-
-    function summonLetter(letter, btn) {
-        if (letter === 'c' && !hasC) {
-            document.getElementById('slot-c').innerText = 'c';
-            btn.classList.add('used');
-            hasC = true;
-            playSound('c');
-        } else if (letter === 'h' && !hasH) {
-            document.getElementById('slot-h').innerText = 'h';
-            btn.classList.add('used');
-            hasH = true;
-            playSound('h');
-        }
-
-        // 两个都齐了，触发合成
-        if (hasC && hasH) {
-            setTimeout(() => {
-                document.getElementById('slot-c').style.borderColor = '#4ade80';
-                document.getElementById('slot-h').style.borderColor = '#4ade80';
-                showToast("✨ 召唤成功！H骑士团 (ch) 诞生！");
-                playSound('ch');
-                
-                // 延迟进入第二阶段
-                setTimeout(() => {
-                    document.getElementById('stage1').classList.add('hidden');
-                    document.getElementById('stage2').classList.remove('hidden');
-                    document.getElementById('story').innerHTML = "太棒了！<b>ch</b> 骑士发出 [tʃ] 的声音。<br>现在，拼出完整的单词 <b>chair</b> (椅子)！";
-                }, 1500);
-            }, 400);
-        }
-    }
-
-    // --- 阶段2：拼写 chair ---
-    const targetWord = ['a', 'i', 'r']; // c 和 h 已经在前面了，这里从第三个格子开始填
-    let currentIndex = 0;
-
-    function spellWord(letter, btn) {
-        if (letter === targetWord[currentIndex]) {
-            // 成功点亮下一个格子
-            let slot = document.getElementById('s' + (currentIndex + 2)); 
-            slot.innerText = letter;
-            slot.classList.add('filled');
-            btn.classList.add('used');
-            playSound(letter);
-            
-            currentIndex++;
-            
-            // 拼写完成
-            if (currentIndex === 3) {
-                setTimeout(() => {
-                    playSound('chair');
-                    showToast("🎉 完美！打败了野怪！");
-                    document.getElementById('story').innerHTML = "🎉 <b>chair</b> 拼读成功！魔法门又多了一块碎片。";
-                    document.getElementById('story').style.color = "#4ade80";
-                    document.getElementById('story').style.borderLeftColor = "#4ade80";
-                    // 禁用所有按钮
-                    document.querySelectorAll('#pool2 .letter-btn').forEach(b => b.style.pointerEvents = 'none');
-                }, 400);
-            }
-        } else {
-            // 选错了抖动
-            btn.style.transform = "translateX(5px)";
-            setTimeout(() => btn.style.transform = "translateX(-5px)", 100);
-            setTimeout(() => btn.style.transform = "translateX(0)", 200);
-            playSound("wrong");
-        }
+    function closeModal(id) {
+        document.getElementById(id).classList.remove('show');
     }
 </script>
 </body>
